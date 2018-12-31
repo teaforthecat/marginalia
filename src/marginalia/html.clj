@@ -98,6 +98,9 @@
   (html [:pre {:class "brush: clojure"}
          (escape-html code-block)]))
 
+(defn img-tag [url]
+  (html [:img {:src url}]))
+
 (defn section-to-html [section]
   (html [:tr
          [:td {:class "docs"} (docs-to-html
@@ -105,7 +108,9 @@
                                  (:raw section)
                                  (:docstring section)))]
          [:td {:class "codes"} (if (= (:type section) :code)
-                                  (codes-to-html (:raw section))
+                                 (if (:image section)
+                                   (img-tag (:image section))
+                                   (codes-to-html (:raw section)))
                                   "")]]))
 
 (defn dependencies-html [deps & header-name]

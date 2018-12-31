@@ -1,7 +1,9 @@
 ;; This file contains the complete Marginalia parser.
 ;; It leverages the Clojure reader instead of implementing a complete
 ;; Clojure parsing solution.
-(ns marginalia.parser
+(ns
+    ^{:title "Parser"}
+    marginalia.parser
   "Provides the parsing facilities for Marginalia."
   (:refer-clojure :exclude [replace])
   (:use [clojure [string :only (join replace lower-case)]]
@@ -339,10 +341,10 @@
   [form raw nspace-sym]
   (cond (literal-form? form)
         (dispatch-literal form raw nspace-sym)
-        (and (first form)
-             (.isInstance clojure.lang.Named (first form))
-             (re-find #"^def" (-> form first name)))
-          (extract-common-docstring form raw nspace-sym)
+        ;; (and (first form)
+        ;;      (.isInstance clojure.lang.Named (first form))
+        ;;      (re-find #"^def" (-> form first name)))
+        ;;   (extract-common-docstring form raw nspace-sym)
         :else
           (dispatch-inner-form form raw nspace-sym)))
 
@@ -481,3 +483,4 @@
                                          (second)
                                          (str)))
                           filename))))
+

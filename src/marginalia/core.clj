@@ -33,9 +33,11 @@
 ;;
 (ns marginalia.core
   (:require [clojure.java.io :as io]
+            [clojure.test :refer [deftest testing is]]
             [clojure.string  :as str])
   (:use [marginalia
          [html :only (uberdoc-html index-html single-page-html)]
+         [doc :as doc]
          [parser :only (parse-file
                         parse-ns
                         *lift-inline-comments*
@@ -175,10 +177,21 @@
 
      :else (recur (merge-line (first lines) cur-group) groups (rest lines)))))
 
-(defn path-to-doc [fn]
-  {:ns     (parse-ns (java.io.File. fn))
-   :groups (parse-file fn)})
-
+(defn path-to-doc
+  "Evaluate a file that will generate docs.
+  If a `main` function is defined it will be called.
+  The docs will be reset/forgot after."
+  [path]
+  (let [file (java.io.File. path)
+        ns-sym (parse-ns file)
+        main-fn (ns-resolve ns-sym '-main)]
+    (load-file path)
+    (if main-fn
+      (apply main-fn))
+    (let [docs @doc/docs]
+      (doc/reset-docs)
+      {:ns ns-sym ;; put title here
+       :groups docs})))
 
 ;; ## Output Generation
 
@@ -224,7 +237,7 @@
    recursively for files."
   [sources]
   (if (nil? sources)
-    (find-processable-file-paths "./src" file-extensions)
+    (find-processable-file-paths "./doc" file-extensions)
     (->> sources
          (mapcat #(if (dir? %)
                     (find-processable-file-paths % file-extensions)
@@ -261,7 +274,7 @@
   [args & [project]]
   (let [[{:keys [dir file name version desc deps css js multi
                  leiningen exclude
-                 lift-inline-comments exclude-lifted-comments]} files help]
+                 lift-inline-comments exclude-lifted-comments] :as opts} files help]
         (cli args
              ["-d" "--dir" "Directory into which the documentation will be written" :default "./docs"]
              ["-f" "--file" "File into which the documentation will be written" :default "uberdoc.html"]
@@ -282,6 +295,7 @@
                  They will be treated as if they preceded the enclosing form." :flag true]
              ["-X" "--exclude-lifted-comments" "If ;; inline comments are being lifted into documentation
                  then also exclude them from the source code display." :flag true])
+
         sources (distinct (format-sources (seq files)))
         sources (if leiningen (cons leiningen sources) sources)]
     (if-not sources
@@ -322,3 +336,33 @@
             (uberdoc!  (str *docs* "/" file) sources opts))
           (println "Done generating your documentation in" *docs*)
           (println ""))))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(comment
+
+
+
+  (map inc [1 2 3])
+
+
+
+  )
