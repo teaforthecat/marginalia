@@ -1,6 +1,6 @@
 (ns marginalia.test.doc-test
   (:require [clojure.test :refer [deftest testing is]]
-            [marginalia.doc :refer [doc check shoot reset-docs]]))
+            [marginalia.doc :refer [doc check shoot reset-docs add-metadata reset-metadata]]))
 
 
 (defn on-earth? [w]
@@ -49,3 +49,11 @@
     (is (= @marginalia.doc/docs [{:docstring "Given the world is flat",
                                   :result false
                                   :image "example/path/to/image.png"}]))))
+
+(deftest title-and-description
+  (testing "add title and description"
+    (let [m {:title "Voyage to the edge of the world"
+             :description "Here we determine what it takes to fall off the edge."}]
+      (reset-metadata)
+      (add-metadata m)
+      (is (= @marginalia.doc/metadata m)))))

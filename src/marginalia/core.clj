@@ -188,9 +188,13 @@
     (load-file path)
     (if main-fn
       (apply main-fn))
-    (let [docs @doc/docs]
+    (let [docs @doc/docs
+          {:keys [title description]} @doc/metadata]
       (doc/reset-docs)
+      (doc/reset-metadata)
       {:ns ns-sym ;; put title here
+       :title title
+       :description description
        :groups docs})))
 
 ;; ## Output Generation
@@ -319,10 +323,10 @@
                                {:name name
                                 :version version
                                 :description desc
-                                :dependencies (split-deps deps)
+                                ;; :dependencies (split-deps deps)
                                 :multi multi
                                 :marginalia marg-opts}
-                               project-clj)
+                               (dissoc project-clj :dependencies))
               sources (->> sources
                            (filter #(not (source-excluded? % opts)))
                            (into []))]

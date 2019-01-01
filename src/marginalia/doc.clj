@@ -2,12 +2,19 @@
 
 
 (def docs (atom []))
+(def metadata (atom {}))
 
 (defn add-doc [doc]
   (swap! docs conj doc ))
 
 (defn reset-docs []
   (reset! docs []))
+
+(defn add-metadata [m]
+  (reset! metadata m))
+
+(defn reset-metadata []
+  (reset! metadata {}))
 
 (defn shoot [return f]
   (assoc return :image (f)))
